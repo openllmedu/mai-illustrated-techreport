@@ -1,0 +1,261 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Attention Mechanisms — MAI-Thinking-1</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700;8..60,800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #faf6f1; --surface: #ffffff; --border: #e8e2da;
+  --text: #1a1512; --text2: #5c4f43; --text3: #9c8e82;
+  --accent: #3d3129; --accent-light: rgba(61,49,41,0.06);
+  --green: #4a7c3f; --green-light: rgba(74,124,63,0.08);
+  --blue: #3a6b8c; --blue-light: rgba(58,107,140,0.08);
+  --orange: #b8602a; --orange-light: rgba(184,96,42,0.08);
+  --serif: 'Source Serif 4', Georgia, serif;
+  --mono: 'DM Mono', 'SF Mono', monospace;
+}
+body { font-family: var(--serif); background: var(--bg); color: var(--text); line-height: 1.7; font-size: 17px; }
+.container { max-width: 780px; margin: 0 auto; padding: 0 24px; }
+a { color: var(--accent); }
+code { font-family: var(--mono); font-size: 14px; background: var(--accent-light); padding: 2px 6px; border-radius: 4px; color: var(--accent); }
+
+/* ── Topnav: breadcrumb bar ── */
+.topnav { background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.breadcrumb { display: flex; align-items: center; gap: 0; flex-wrap: wrap; font-size: 13px; min-width: 0; }
+.breadcrumb a, .breadcrumb span { white-space: nowrap; }
+.breadcrumb a { color: var(--text3); text-decoration: none; transition: color 0.15s; }
+.breadcrumb a:hover { color: var(--accent); }
+.bc-sep { color: var(--border); margin: 0 8px; font-size: 11px; }
+.bc-current { font-weight: 600; color: var(--text); }
+.nav-arrows { display: flex; gap: 4px; flex-shrink: 0; }
+.nav-arrows a { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 6px; border: 1px solid var(--border); color: var(--text2); text-decoration: none; font-size: 14px; transition: all 0.15s; }
+.nav-arrows a:hover { background: var(--accent-light); }
+.nav-arrows a.disabled { opacity: 0.3; pointer-events: none; }
+
+/* ── Chapter strip (shows all sections in current chapter) ── */
+.ch-strip { background: var(--surface); border-bottom: 1px solid var(--border); padding: 6px 24px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+.ch-strip::-webkit-scrollbar { height: 0; }
+.ch-strip a { display: inline-block; font-family: var(--mono); font-size: 12px; color: var(--text3); text-decoration: none; padding: 5px 10px; border-radius: 5px; margin-right: 2px; transition: all 0.12s; }
+.ch-strip a:hover { background: var(--accent-light); color: var(--text2); }
+.ch-strip a.active { background: var(--accent); color: #f5f0eb; }
+
+/* ── Hero ── */
+.hero { padding: 48px 0 32px; border-bottom: 1px solid var(--border); margin-bottom: 36px; }
+.hero-eyebrow { font-family: var(--mono); font-size: 12px; color: var(--text3); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
+.hero h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.8px; line-height: 1.2; margin-bottom: 12px; }
+.hero h1 span { color: var(--text2); font-weight: 500; }
+.hero-sub { font-size: 17px; color: var(--text2); line-height: 1.6; max-width: 620px; }
+
+/* ── TLDR ── */
+.tldr { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 22px 26px; margin-bottom: 36px; }
+.tldr-label { font-family: var(--mono); font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.tldr p { font-size: 15px; color: var(--text2); line-height: 1.7; }
+
+/* ── Section ── */
+.section { margin-bottom: 44px; }
+.section h2 { font-size: 24px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 8px; }
+.section h3 { font-size: 19px; font-weight: 700; margin: 28px 0 8px; }
+.section p { margin-bottom: 14px; font-size: 16px; }
+.section ul, .section ol { margin: 10px 0 14px; padding-left: 24px; font-size: 16px; }
+.section li { margin-bottom: 6px; }
+
+/* ── Concept cards ── */
+.concepts { display: grid; gap: 14px; margin: 20px 0; }
+.concept { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; }
+.concept h3 { font-size: 16px; font-weight: 700; margin: 0 0 6px; }
+.concept .original { font-size: 13px; color: var(--text3); font-style: italic; margin-bottom: 8px; padding: 8px 12px; background: var(--accent-light); border-radius: 6px; line-height: 1.5; }
+.concept .original::before { content: 'From the paper: '; font-weight: 600; font-style: normal; color: var(--text2); }
+.concept .explain { font-size: 15px; color: var(--text2); line-height: 1.6; }
+.concept .explain p { margin-bottom: 6px; }
+
+/* ── Stats ── */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin: 24px 0; }
+.stat { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; text-align: center; }
+.stat-value { font-family: var(--mono); font-size: 22px; font-weight: 500; color: var(--accent); margin-bottom: 4px; }
+.stat-label { font-size: 11px; color: var(--text3); line-height: 1.3; }
+
+/* ── Figures ── */
+.figure-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin: 28px 0; }
+.figure-card img { width: 100%; display: block; }
+.figure-caption { padding: 14px 20px; border-top: 1px solid var(--border); }
+.figure-caption .cap-label { font-family: var(--mono); font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.figure-caption .cap-plain { font-size: 14px; color: var(--text2); line-height: 1.6; }
+.figure-caption .cap-original { font-size: 12px; color: var(--text3); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); line-height: 1.4; }
+
+/* ── Jargon tooltip ── */
+.j { border-bottom: 1.5px dashed var(--text3); cursor: pointer; position: relative; color: inherit; text-decoration: none; padding: 2px 0; }
+.j::before { content: ''; position: absolute; inset: -6px -4px; }
+.j .tip { visibility: hidden; opacity: 0; position: absolute; bottom: calc(100% + 2px); left: 50%; transform: translateX(-50%) translateY(4px); background: var(--accent); color: #f5f0eb; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-style: normal; line-height: 1.55; white-space: normal; width: 320px; max-width: 90vw; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.2); pointer-events: none; transition: opacity 0.15s, transform 0.15s, visibility 0s 0.15s; font-weight: 400; }
+.j .tip::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 8px solid transparent; border-top-color: var(--accent); }
+.j:hover .tip, .j:focus .tip { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; transition: opacity 0.15s, transform 0.15s, visibility 0s; }
+.j .tip .glink { display: block; margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(245,240,235,0.25); font-size: 11px; color: rgba(245,240,235,0.75); font-family: var(--mono); cursor: pointer; }
+.j .tip .glink:hover { color: #fff; }
+.j .tip .glink::before { content: '-> '; }
+
+/* ── Deep-dive link ── */
+.deep-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-family: var(--mono); color: var(--blue); text-decoration: none; padding: 4px 10px; border: 1px solid rgba(58,107,140,0.3); border-radius: 6px; margin: 4px 4px 4px 0; transition: all 0.15s; }
+.deep-link:hover { background: var(--blue-light); }
+.deep-link::after { content: '->'; }
+
+/* ── Callouts ── */
+.example { background: var(--blue-light); border-left: 3px solid var(--blue); padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 18px 0; font-size: 15px; color: var(--text2); }
+.example::before { content: 'Example'; display: block; font-family: var(--mono); font-size: 11px; color: var(--blue); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; margin-bottom: 5px; }
+.takeaway { background: var(--green-light); border-left: 3px solid var(--green); padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 20px 0; font-size: 15px; color: var(--text2); }
+.takeaway::before { content: 'Key takeaway'; display: block; font-family: var(--mono); font-size: 11px; color: var(--green); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; margin-bottom: 5px; }
+.note { background: var(--orange-light); border-left: 3px solid var(--orange); padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 18px 0; font-size: 15px; color: var(--text2); }
+.note::before { content: 'Interesting finding'; display: block; font-family: var(--mono); font-size: 11px; color: var(--orange); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; margin-bottom: 5px; }
+
+/* ── Table ── */
+.data-table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 14px; }
+.data-table th { text-align: left; padding: 8px 10px; border-bottom: 2px solid var(--accent); font-weight: 700; font-size: 12px; font-family: var(--mono); color: var(--text2); }
+.data-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); }
+.data-table tr:hover td { background: var(--accent-light); }
+.num { font-family: var(--mono); text-align: right; }
+
+/* ── Bottom nav ── */
+.bottom-nav { display: flex; justify-content: space-between; align-items: center; padding: 24px 0; margin-top: 40px; border-top: 1px solid var(--border); gap: 12px; }
+.bottom-nav a { font-size: 14px; color: var(--text2); text-decoration: none; padding: 10px 20px; border: 1px solid var(--border); border-radius: 8px; transition: all 0.15s; max-width: 45%; }
+.bottom-nav a:hover { background: var(--accent-light); }
+.bottom-nav a.next { background: var(--accent); color: #f5f0eb; border-color: var(--accent); }
+.bottom-nav a.next:hover { opacity: 0.9; }
+.bottom-nav .spacer { flex: 1; }
+
+/* ── Page grid for index pages ── */
+.page-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 24px 0; }
+.page-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px 22px; text-decoration: none; color: inherit; transition: all 0.15s; }
+.page-card:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.page-card .card-num { font-family: var(--mono); font-size: 12px; color: var(--text3); margin-bottom: 4px; }
+.page-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+.page-card p { font-size: 13px; color: var(--text2); line-height: 1.5; }
+
+/* ── Chapter grid (for intro/conclusion) ── */
+.chapter-grid { display: grid; gap: 14px; margin: 30px 0; }
+.chapter-link { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 22px; text-decoration: none; color: inherit; transition: all 0.15s; display: grid; grid-template-columns: 42px 1fr; gap: 14px; align-items: start; }
+.chapter-link:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.chapter-num { font-family: var(--mono); font-size: 14px; color: var(--text3); background: var(--accent-light); width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 8px; }
+.chapter-link h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; color: var(--text); }
+.chapter-link p { font-size: 13px; color: var(--text2); line-height: 1.5; margin: 0; }
+
+@media (max-width: 700px) {
+  .hero h1 { font-size: 24px; }
+  .hero { padding: 36px 0 24px; }
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .page-grid { grid-template-columns: 1fr; }
+  .breadcrumb { font-size: 12px; }
+  .ch-strip a { font-size: 11px; padding: 4px 8px; }
+}
+html { scroll-behavior: smooth; }
+</style></head>
+<body>
+<nav class="topnav"><div class="breadcrumb"><a href="../../mai_intro.html">MAI-Thinking-1</a><span class="bc-sep">/</span><a href="../index.html">Ch 2: Pre-training</a><span class="bc-sep">/</span><span class="bc-current">2.1 Model Architecture</span></div><div class="nav-arrows"><a href="../index.html" title="Previous">&larr;</a><a href="../2-ablations.html" title="Next">&rarr;</a></div></nav>
+<div class="ch-strip"><a href="../index.html">Overview</a><a href="../1-architecture.html" class="active">2.1</a><a href="../2-ablations.html">2.2</a><a href="../3-evals.html">2.3</a><a href="../4-data.html">2.4</a><a href="../5-mixture.html">2.5</a><a href="../6-recipe.html">2.6</a><a href="../8-results.html">2.7</a><a href="../7-yolo.html">2.8</a></div>
+<div class="container">
+<section class="hero">
+  <div class="hero-eyebrow">Concept Deep-Dive</div>
+  <h1>Attention Mechanisms</h1>
+  <p class="hero-sub">How MAI-Base-1 uses local/global periodic attention and GQA to balance quality and efficiency</p>
+</section>
+
+<div class="tldr"><div class="tldr-label">TL;DR</div><p>
+  Attention lets each token "look at" other tokens to understand context. MAI-Base-1 uses periodic local/global attention (5:1 ratio) to cut costs, Grouped-Query Attention (8 KV heads) to shrink inference memory, and no position encoding on global layers.
+</p></div>
+
+<div class="section">
+  <h2>What Is Attention?</h2>
+  <p>In a sentence like "The bank by the river was flooded," the word "bank" could mean a financial institution or a riverbank. Attention is the mechanism that lets the model look at other words ("river," "flooded") to figure out which meaning applies.</p>
+
+  <p>Technically, for each token, the model computes three vectors from the same input via separate learned projections:</p>
+  <ul>
+    <li><strong>Query (Q)</strong> — "what am I looking for?" Each token generates a Q vector that encodes what context it needs. "bank" might ask: "I am an ambiguous noun — what is my environment?"</li>
+    <li><strong>Key (K)</strong> — "what do I advertise?" Each token's K vector describes what it offers. "river" advertises: "I describe natural terrain."</li>
+    <li><strong>Value (V)</strong> — "what content do I share?" The actual information read when someone attends to this token. Keys are for matching; values are for reading. A book titled "Geography" (Key) contains information about rivers (Value).</li>
+  </ul>
+
+  <p>The attention formula: <code>Attention(Q, K, V) = softmax(Q x K^T / sqrt(d_k)) x V</code></p>
+  <ul>
+    <li><strong>Q x K^T</strong> — dot product of each Q with every K. High score = relevant match. Produces an [n x n] score matrix.</li>
+    <li><strong>/ sqrt(d_k)</strong> — scale down so no single match dominates. Without this, large dot products push softmax to a one-hot distribution. In MAI-Base-1, d_k = 128, so divide by ~11.3.</li>
+    <li><strong>softmax</strong> — convert scores to weights summing to 100%. "bank" might put 40% on "river," 25% on "flooded," 15% on itself.</li>
+    <li><strong>x V</strong> — weighted sum of V vectors. "bank" absorbs 40% of V_river + 25% of V_flooded + ... The output is "bank" infused with riverbank context.</li>
+  </ul>
+
+  <div class="example">In a causal decoder model generating "The cat sat on," when producing the next token: Q comes from "on" (the current token), K and V come from all previous tokens including "on" itself. The model computes Q_on dot K_The, Q_on dot K_cat, Q_on dot K_sat, Q_on dot K_on. If "sat" scores highest (say 50%), the output is dominated by V_sat's content. Q is used once and discarded; K and V are stored in the KV cache for all future tokens to attend to.</div>
+</div>
+
+<div class="section">
+  <h2>Multi-Head Attention</h2>
+  <p>A single attention computation can only focus on one type of relationship. Multiple heads let the model look for many patterns simultaneously. MAI-Base-1 has 80 query heads — the model splits the embedding into 80 smaller pieces, runs attention on each independently, then concatenates the results.</p>
+  <p>Research has identified specific head types that emerge during training:</p>
+  <ul>
+    <li><strong>Previous Token Heads</strong> (early layers) — always attend to position i-1, providing "what came before" signal</li>
+    <li><strong>Induction Heads</strong> (mid layers) — pattern-match: if [A][B] appeared before and [A] appears again, predict [B]. The core mechanism behind in-context learning</li>
+    <li><strong>Duplicate Token Heads</strong> — detect when the same token appeared earlier, helping track references</li>
+    <li><strong>Copy Suppression Heads</strong> — prevent the model from naively copying tokens, writing opposing signals to suppress repetition</li>
+  </ul>
+</div>
+
+<div class="section">
+  <h2>Local vs. Global Attention</h2>
+  <p>The quadratic cost is the key bottleneck. MAI-Base-1's solution: most layers only look at nearby tokens.</p>
+
+  <div class="concepts">
+    <div class="concept">
+      <h3>Local Attention (5 out of every 6 layers)</h3>
+      <p class="explain">Each token only attends to the nearest 512 tokens (sliding window). Cost is O(n × 512) instead of O(n²). Uses <a class="j" href="https://www.google.com/search?q=What+is+Rotary+Position+Encoding+RoPE+in+LLMs%2C+how+it+encodes+position+information+in+Transformers" target="_blank">RoPE<span class="tip">Rotary Position Encoding — encodes relative positions by rotating query and key vectors. Base frequency 10,000. Allows the model to understand word order within the local window.<span class="glink">Learn more</span></span></a> (Rotary Position Encoding) with base frequency 10,000.</p>
+    </div>
+    <div class="concept">
+      <h3>Global Attention (every 6th layer)</h3>
+      <p class="explain">Each token attends to all tokens in the sequence. Uses <strong>no position encoding</strong> — found to perform comparably to RoPE while being more efficient. This is where the model connects information from distant parts of the input.</p>
+    </div>
+  </div>
+
+  <p>This 5:1 ratio (from Gemma 3) significantly reduces both training compute and <a class="j" href="https://www.google.com/search?q=What+is+KV+cache+in+LLM+inference%2C+how+key-value+cache+works+for+autoregressive+generation+speed" target="_blank">KV cache<span class="tip">During inference, the model stores the key and value vectors for all previously generated tokens. With 256K context, this can be enormous. Local attention reduces KV cache size because only the last 512 tokens need to be cached for most layers.<span class="glink">Learn more</span></span></a> size during inference.</p>
+</div>
+
+<div class="section">
+  <h2>The KV Cache: Why Inference Gets Expensive</h2>
+  <p>During autoregressive generation, the model produces tokens one at a time. Each new token needs to attend to all previous tokens. Without caching, generating token #1000 would re-compute keys and values for all 999 preceding tokens — wasting massive compute. The KV cache stores each token's K and V vectors when first computed, so they are reused for every future token.</p>
+
+  <p>The tradeoff: KV cache saves compute but costs memory. For MAI-Base-1 at 256K context:</p>
+  <ul>
+    <li><strong>Global layers (13 layers):</strong> 8 KV heads x 2 (K+V) x 128 dims x 256K tokens x 2 bytes (FP16) = <strong>0.52 GB per layer</strong>, 6.8 GB total</li>
+    <li><strong>Local layers (65 layers):</strong> Only cache the last 512 tokens per layer — 8 x 2 x 128 x 512 x 2 = <strong>1 MB per layer</strong>, 65 MB total</li>
+    <li><strong>Total:</strong> ~6.9 GB — vs ~69 GB if all layers used full MHA with 80 KV heads globally</li>
+  </ul>
+
+  <div class="note">This is why MAI-Base-1's architecture choices compound: GQA (10x fewer KV heads) x local attention (512 vs 256K for 83% of layers) = roughly 100x KV cache reduction vs a naive MHA global-attention design. Without these optimizations, serving 256K context would be impractical on current hardware.</div>
+</div>
+
+<div class="section">
+  <h2>Attention Failure Modes</h2>
+  <p>Understanding what can go wrong helps explain MAI-Base-1's design choices:</p>
+  <ul>
+    <li><strong>Attention dilution:</strong> On very long contexts, attention weights spread thin across thousands of tokens. Important information in the middle of a long prompt may receive too little weight — the "lost in the middle" phenomenon. MAI-Base-1 mitigates this with local attention windows that keep focus concentrated.</li>
+    <li><strong>Positional degradation:</strong> Models trained on shorter sequences can perform poorly when extended to longer ones. RoPE helps with relative position encoding, and the long-context extension phase (Section 2.6) progressively trains on longer sequences.</li>
+    <li><strong>Quadratic cost:</strong> Attention cost grows as O(n^2 x d). Doubling context from 32K to 64K roughly quadruples attention compute. Local attention makes this O(n x window_size x d) for 83% of layers.</li>
+  </ul>
+</div>
+
+<div class="section">
+  <h2>Grouped-Query Attention (GQA)</h2>
+  <p>Standard multi-head attention has separate K and V projections for every attention head. GQA shares K and V across groups of heads:</p>
+  <ul>
+    <li>MAI-Base-1: <strong>80 query heads</strong> but only <strong>8 KV heads</strong> (10:1 ratio)</li>
+    <li>Per-head dimension: 128</li>
+    <li>KV cache is 10x smaller than standard multi-head attention</li>
+    <li>Quality is preserved because the Q heads can still attend to different things — they just share the K/V representations</li>
+  </ul>
+
+  <div class="example"><strong>Memory savings in practice:</strong> For a 256K-context global attention layer, standard multi-head attention (80 KV heads) would need 80 × 2 × 128 × 256K = 5.2 GB of KV cache <em>per layer</em>. With GQA (8 KV heads), that drops to 0.52 GB per layer. Across 13 global attention layers, that's 67 GB saved — the difference between fitting on one GPU or needing two.</div>
+</div>
+
+<div class="section">
+  <h2>Additional Details</h2>
+  <ul>
+    <li><strong>QK-Norm:</strong> RMSNorm applied to queries and keys before computing attention scores, for training stability at scale</li>
+    <li><strong>FlashAttention-4:</strong> Used for efficient GPU implementation, with Ulysses-style context parallelism for long sequences</li>
+    <li><strong>Zero initialization:</strong> Attention output starts at zero (via zero RMSNorm gains), so the model initially processes tokens independently. Cross-token attention interactions emerge gradually during training, preventing early-stage MoE expert imbalance.</li>
+  </ul>
+</div>
+
+<div class="bottom-nav">
+  <a href="../1-architecture.html">&larr; Back to 2.1 Model Architecture</a>
+  <span class="spacer"></span>
+</div>
+</div></body></html>

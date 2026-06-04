@@ -1,0 +1,221 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>GRPO &amp; Adaptive Entropy Control — MAI-Thinking-1</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700;8..60,800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #faf6f1; --surface: #ffffff; --border: #e8e2da;
+  --text: #1a1512; --text2: #5c4f43; --text3: #9c8e82;
+  --accent: #3d3129; --accent-light: rgba(61,49,41,0.06);
+  --green: #4a7c3f; --green-light: rgba(74,124,63,0.08);
+  --blue: #3a6b8c; --blue-light: rgba(58,107,140,0.08);
+  --orange: #b8602a; --orange-light: rgba(184,96,42,0.08);
+  --serif: 'Source Serif 4', Georgia, serif;
+  --mono: 'DM Mono', 'SF Mono', monospace;
+}
+body { font-family: var(--serif); background: var(--bg); color: var(--text); line-height: 1.7; font-size: 17px; }
+.container { max-width: 780px; margin: 0 auto; padding: 0 24px; }
+a { color: var(--accent); }
+code { font-family: var(--mono); font-size: 14px; background: var(--accent-light); padding: 2px 6px; border-radius: 4px; color: var(--accent); }
+
+/* ── Topnav: breadcrumb bar ── */
+.topnav { background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.breadcrumb { display: flex; align-items: center; gap: 0; flex-wrap: wrap; font-size: 13px; min-width: 0; }
+.breadcrumb a, .breadcrumb span { white-space: nowrap; }
+.breadcrumb a { color: var(--text3); text-decoration: none; transition: color 0.15s; }
+.breadcrumb a:hover { color: var(--accent); }
+.bc-sep { color: var(--border); margin: 0 8px; font-size: 11px; }
+.bc-current { font-weight: 600; color: var(--text); }
+.nav-arrows { display: flex; gap: 4px; flex-shrink: 0; }
+.nav-arrows a { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 6px; border: 1px solid var(--border); color: var(--text2); text-decoration: none; font-size: 14px; transition: all 0.15s; }
+.nav-arrows a:hover { background: var(--accent-light); }
+.nav-arrows a.disabled { opacity: 0.3; pointer-events: none; }
+
+/* ── Chapter strip (shows all sections in current chapter) ── */
+.ch-strip { background: var(--surface); border-bottom: 1px solid var(--border); padding: 6px 24px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+.ch-strip::-webkit-scrollbar { height: 0; }
+.ch-strip a { display: inline-block; font-family: var(--mono); font-size: 12px; color: var(--text3); text-decoration: none; padding: 5px 10px; border-radius: 5px; margin-right: 2px; transition: all 0.12s; }
+.ch-strip a:hover { background: var(--accent-light); color: var(--text2); }
+.ch-strip a.active { background: var(--accent); color: #f5f0eb; }
+
+/* ── Hero ── */
+.hero { padding: 48px 0 32px; border-bottom: 1px solid var(--border); margin-bottom: 36px; }
+.hero-eyebrow { font-family: var(--mono); font-size: 12px; color: var(--text3); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
+.hero h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.8px; line-height: 1.2; margin-bottom: 12px; }
+.hero h1 span { color: var(--text2); font-weight: 500; }
+.hero-sub { font-size: 17px; color: var(--text2); line-height: 1.6; max-width: 620px; }
+
+/* ── TLDR ── */
+.tldr { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 22px 26px; margin-bottom: 36px; }
+.tldr-label { font-family: var(--mono); font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.tldr p { font-size: 15px; color: var(--text2); line-height: 1.7; }
+
+/* ── Section ── */
+.section { margin-bottom: 44px; }
+.section h2 { font-size: 24px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 8px; }
+.section h3 { font-size: 19px; font-weight: 700; margin: 28px 0 8px; }
+.section p { margin-bottom: 14px; font-size: 16px; }
+.section ul, .section ol { margin: 10px 0 14px; padding-left: 24px; font-size: 16px; }
+.section li { margin-bottom: 6px; }
+
+/* ── Concept cards ── */
+.concepts { display: grid; gap: 14px; margin: 20px 0; }
+.concept { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; }
+.concept h3 { font-size: 16px; font-weight: 700; margin: 0 0 6px; }
+.concept .original { font-size: 13px; color: var(--text3); font-style: italic; margin-bottom: 8px; padding: 8px 12px; background: var(--accent-light); border-radius: 6px; line-height: 1.5; }
+.concept .original::before { content: 'From the paper: '; font-weight: 600; font-style: normal; color: var(--text2); }
+.concept .explain { font-size: 15px; color: var(--text2); line-height: 1.6; }
+.concept .explain p { margin-bottom: 6px; }
+
+/* ── Stats ── */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin: 24px 0; }
+.stat { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; text-align: center; }
+.stat-value { font-family: var(--mono); font-size: 22px; font-weight: 500; color: var(--accent); margin-bottom: 4px; }
+.stat-label { font-size: 11px; color: var(--text3); line-height: 1.3; }
+
+/* ── Figures ── */
+.figure-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin: 28px 0; }
+.figure-card img { width: 100%; display: block; }
+.figure-caption { padding: 14px 20px; border-top: 1px solid var(--border); }
+.figure-caption .cap-label { font-family: var(--mono); font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.figure-caption .cap-plain { font-size: 14px; color: var(--text2); line-height: 1.6; }
+.figure-caption .cap-original { font-size: 12px; color: var(--text3); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); line-height: 1.4; }
+
+/* ── Jargon tooltip ── */
+.j { border-bottom: 1.5px dashed var(--text3); cursor: pointer; position: relative; color: inherit; text-decoration: none; padding: 2px 0; }
+.j::before { content: ''; position: absolute; inset: -6px -4px; }
+.j .tip { visibility: hidden; opacity: 0; position: absolute; bottom: calc(100% + 2px); left: 50%; transform: translateX(-50%) translateY(4px); background: var(--accent); color: #f5f0eb; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-style: normal; line-height: 1.55; white-space: normal; width: 320px; max-width: 90vw; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.2); pointer-events: none; transition: opacity 0.15s, transform 0.15s, visibility 0s 0.15s; font-weight: 400; }
+.j .tip::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 8px solid transparent; border-top-color: var(--accent); }
+.j:hover .tip, .j:focus .tip { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; transition: opacity 0.15s, transform 0.15s, visibility 0s; }
+.j .tip .glink { display: block; margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(245,240,235,0.25); font-size: 11px; color: rgba(245,240,235,0.75); font-family: var(--mono); cursor: pointer; }
+.j .tip .glink:hover { color: #fff; }
+.j .tip .glink::before { content: '-> '; }
+
+/* ── Deep-dive link ── */
+.deep-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-family: var(--mono); color: var(--blue); text-decoration: none; padding: 4px 10px; border: 1px solid rgba(58,107,140,0.3); border-radius: 6px; margin: 4px 4px 4px 0; transition: all 0.15s; }
+.deep-link:hover { background: var(--blue-light); }
+.deep-link::after { content: '->'; }
+
+/* ── Callouts ── */
+.example { background: var(--blue-light); border-left: 3px solid var(--blue); padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 18px 0; font-size: 15px; color: var(--text2); }
+.example::before { content: 'Example'; display: block; font-family: var(--mono); font-size: 11px; color: var(--blue); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; margin-bottom: 5px; }
+.takeaway { background: var(--green-light); border-left: 3px solid var(--green); padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 20px 0; font-size: 15px; color: var(--text2); }
+.takeaway::before { content: 'Key takeaway'; display: block; font-family: var(--mono); font-size: 11px; color: var(--green); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; margin-bottom: 5px; }
+.note { background: var(--orange-light); border-left: 3px solid var(--orange); padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 18px 0; font-size: 15px; color: var(--text2); }
+.note::before { content: 'Interesting finding'; display: block; font-family: var(--mono); font-size: 11px; color: var(--orange); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; margin-bottom: 5px; }
+
+/* ── Table ── */
+.data-table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 14px; }
+.data-table th { text-align: left; padding: 8px 10px; border-bottom: 2px solid var(--accent); font-weight: 700; font-size: 12px; font-family: var(--mono); color: var(--text2); }
+.data-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); }
+.data-table tr:hover td { background: var(--accent-light); }
+.num { font-family: var(--mono); text-align: right; }
+
+/* ── Bottom nav ── */
+.bottom-nav { display: flex; justify-content: space-between; align-items: center; padding: 24px 0; margin-top: 40px; border-top: 1px solid var(--border); gap: 12px; }
+.bottom-nav a { font-size: 14px; color: var(--text2); text-decoration: none; padding: 10px 20px; border: 1px solid var(--border); border-radius: 8px; transition: all 0.15s; max-width: 45%; }
+.bottom-nav a:hover { background: var(--accent-light); }
+.bottom-nav a.next { background: var(--accent); color: #f5f0eb; border-color: var(--accent); }
+.bottom-nav a.next:hover { opacity: 0.9; }
+.bottom-nav .spacer { flex: 1; }
+
+/* ── Page grid for index pages ── */
+.page-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 24px 0; }
+.page-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px 22px; text-decoration: none; color: inherit; transition: all 0.15s; }
+.page-card:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.page-card .card-num { font-family: var(--mono); font-size: 12px; color: var(--text3); margin-bottom: 4px; }
+.page-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+.page-card p { font-size: 13px; color: var(--text2); line-height: 1.5; }
+
+/* ── Chapter grid (for intro/conclusion) ── */
+.chapter-grid { display: grid; gap: 14px; margin: 30px 0; }
+.chapter-link { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 22px; text-decoration: none; color: inherit; transition: all 0.15s; display: grid; grid-template-columns: 42px 1fr; gap: 14px; align-items: start; }
+.chapter-link:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.chapter-num { font-family: var(--mono); font-size: 14px; color: var(--text3); background: var(--accent-light); width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 8px; }
+.chapter-link h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; color: var(--text); }
+.chapter-link p { font-size: 13px; color: var(--text2); line-height: 1.5; margin: 0; }
+
+@media (max-width: 700px) {
+  .hero h1 { font-size: 24px; }
+  .hero { padding: 36px 0 24px; }
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .page-grid { grid-template-columns: 1fr; }
+  .breadcrumb { font-size: 12px; }
+  .ch-strip a { font-size: 11px; padding: 4px 8px; }
+}
+html { scroll-behavior: smooth; }
+</style></head>
+<body>
+<nav class="topnav"><div class="breadcrumb"><a href="../../mai_intro.html">MAI-Thinking-1</a><span class="bc-sep">/</span><a href="../index.html">Ch 3: The RL Climb</a><span class="bc-sep">/</span><span class="bc-current">3.1 RL Recipe</span></div><div class="nav-arrows"><a href="../index.html" title="Previous">&larr;</a><a href="../2-stem.html" title="Next">&rarr;</a></div></nav>
+<div class="ch-strip"><a href="../index.html">Overview</a><a href="../1-recipe.html" class="active">3.1</a><a href="../2-stem.html">3.2</a><a href="../3-agentic.html">3.3</a><a href="../4-helpfulness.html">3.4</a><a href="../5-consolidation.html">3.5</a><a href="../6-infra.html">3.6</a></div>
+<div class="container">
+<section class="hero">
+  <div class="hero-eyebrow">Concept Deep-Dive</div>
+  <h1>GRPO &amp; Adaptive Entropy Control</h1>
+  <p class="hero-sub">How Group Relative Policy Optimization avoids value networks, and how adaptive entropy keeps training stable.</p>
+</section>
+
+<div class="section">
+  <h2>The Post-Training Pipeline</h2>
+  <p>Pre-training produces a capable base model — but it just autocompletes text. It won't answer questions, follow instructions, or reason step-by-step. The post-training pipeline transforms this raw capability into a useful assistant through three phases:</p>
+  <ol>
+    <li><strong>SFT (Supervised Fine-Tuning)</strong> — Train on human-written (instruction, response) pairs to teach the Q&A format. The model learns to behave as a helpful assistant rather than a text continuation engine.</li>
+    <li><strong>Reasoning RL (GRPO)</strong> — RL on math/code with verifiable answers. This is where the model learns to "think step-by-step" via chain-of-thought. The reward is objective: did the answer match the ground truth? This is the core of MAI's RL climb.</li>
+    <li><strong>Alignment RL (RLHF/DPO)</strong> — RL from human preferences. Humans rank model outputs to train helpful, harmless, honest behavior.</li>
+  </ol>
+  <p>This order matters. Pre-training sets the <strong>ceiling</strong> of what the model can do. Post-training determines the <strong>accessibility</strong> — whether users can actually get the model to do useful things. The InstructGPT result is striking: a 1.3B-parameter aligned model was preferred by humans over an unaligned 175B model — not because post-training is more important, but because without it the larger model's capability was inaccessible.</p>
+</div>
+
+<div class="section">
+  <h2>What Problem Does GRPO Solve?</h2>
+  <p>Standard RL algorithms for LLMs (like PPO) need a separate "value network" that estimates how good each state is. This value network has its own parameters, needs its own training, and adds significant complexity. For a 962-billion-parameter model, maintaining a separate value network is extremely expensive — it effectively doubles memory requirements.</p>
+  <p><strong>GRPO eliminates the value network entirely.</strong> Instead of estimating absolute state values, it uses the <em>relative performance within a group of responses</em> to compute advantages. This halves memory compared to PPO while achieving comparable or better results.</p>
+
+  <h3>GRPO vs Other Alignment Methods</h3>
+  <table class="data-table">
+    <tr><th>Method</th><th>Needs Value Network?</th><th>Needs Reward Model?</th><th>Signal Type</th><th>Used By</th></tr>
+    <tr><td>PPO (InstructGPT/ChatGPT)</td><td>Yes (doubles memory)</td><td>Yes</td><td>RM score per response</td><td>Original ChatGPT</td></tr>
+    <tr><td>DPO (Direct Preference)</td><td>No</td><td>No (preference pairs)</td><td>Preferred vs. dispreferred</td><td>LLaMA 3/4, Zephyr</td></tr>
+    <tr><td>GRPO (MAI)</td><td>No</td><td>Optional (verifiable rewards)</td><td>Group-relative advantage</td><td>DeepSeek-R1, Qwen3, MAI</td></tr>
+  </table>
+  <p>GRPO is now the dominant algorithm for reasoning RL across frontier labs. Its key insight: for tasks with verifiable answers (math, code), you don't need a learned reward model — just check if the answer is correct. The group comparison provides natural baselines without needing to estimate state values.</p>
+</div>
+
+<div class="section">
+  <h2>How GRPO Works, Step by Step</h2>
+  <ol>
+    <li><strong>Sample a group:</strong> For a given prompt, generate G=128 responses from the current model</li>
+    <li><strong>Score each response:</strong> Use the reward function to assign each response a scalar score</li>
+    <li><strong>Compute advantages:</strong> For response i with reward R_i, the advantage is:
+      <div style="font-family: var(--mono); background: var(--accent-light); padding: 12px; border-radius: 6px; margin: 8px 0;">A_i = (R_i - mean(R_1...R_G)) / std(R_1...R_G)</div>
+      This normalizes rewards within the group, making the scale irrelevant.</li>
+    <li><strong>Update the model:</strong> For each token in each response, compute the probability ratio between the new and old policy. Multiply by the advantage and clip to stay within the trust region.</li>
+  </ol>
+
+  <div class="example"><strong>Concrete example with G=4 (simplified):</strong> Given the prompt "What is 7x8?", the model generates: "56" (correct), "54" (wrong), "56" (correct), "48" (wrong). Rewards: [1, 0, 1, 0]. Mean=0.5, std=0.5. Advantages: [+1, -1, +1, -1]. The model increases the probability of tokens that led to "56" and decreases those that led to "54" and "48".</div>
+</div>
+
+<div class="section">
+  <h2>Why Entropy Matters</h2>
+  <p>During RL training, two failure modes threaten the model:</p>
+  <ul>
+    <li><strong>Entropy collapse</strong> &mdash; The model becomes too confident, always producing the same response. It stops exploring and can't discover better strategies. Once collapsed, recovery is nearly impossible.</li>
+    <li><strong>Entropy explosion</strong> &mdash; The model becomes too random, producing incoherent outputs. Training signal becomes noisy and uninformative.</li>
+  </ul>
+
+  <h3>The Adaptive Controller</h3>
+  <p>MAI's solution is an integral controller that adjusts the upper clip bound dynamically:</p>
+  <ol>
+    <li>Set a target entropy H* = 0.3</li>
+    <li>At each step, estimate the current entropy from the training batch</li>
+    <li>If entropy &lt; H*: increase k (wider clip bound = more exploration allowed)</li>
+    <li>If entropy &gt; H*: decrease k (tighter clip bound = more conservative updates)</li>
+    <li>k is bounded between 0 and k_max = 2.5</li>
+  </ol>
+  <p>The controller starts at k=0 (symmetric clip bounds) and adapts from there. The step size delta=0.25 means k changes by at most 0.25 per training step.</p>
+
+  <div class="takeaway">The adaptive entropy controller acts as an automatic thermostat for exploration. Without it, the team would need to manually monitor entropy and tune clipping bounds &mdash; impractical for training runs lasting weeks.</div>
+</div>
+
+<div class="bottom-nav">
+  <a href="../1-recipe.html">&larr; Back to 3.1 RL Recipe</a>
+  <span class="spacer"></span>
+</div>
+</div></body></html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>6.3 Inference &amp; Sustainability — MAI-Thinking-1</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700;8..60,800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #faf6f1; --surface: #ffffff; --border: #e8e2da;
+  --text: #1a1512; --text2: #5c4f43; --text3: #9c8e82;
+  --accent: #3d3129; --accent-light: rgba(61,49,41,0.06);
+  --green: #4a7c3f; --green-light: rgba(74,124,63,0.08);
+  --blue: #3a6b8c; --blue-light: rgba(58,107,140,0.08);
+  --orange: #b8602a; --orange-light: rgba(184,96,42,0.08);
+  --serif: 'Source Serif 4', Georgia, serif;
+  --mono: 'DM Mono', 'SF Mono', monospace;
+}
+body { font-family: var(--serif); background: var(--bg); color: var(--text); line-height: 1.7; font-size: 17px; }
+.container { max-width: 780px; margin: 0 auto; padding: 0 24px; }
+a { color: var(--accent); }
+code { font-family: var(--mono); font-size: 14px; background: var(--accent-light); padding: 2px 6px; border-radius: 4px; color: var(--accent); }
+
+/* ── Topnav: breadcrumb bar ── */
+.topnav { background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.breadcrumb { display: flex; align-items: center; gap: 0; flex-wrap: wrap; font-size: 13px; min-width: 0; }
+.breadcrumb a, .breadcrumb span { white-space: nowrap; }
+.breadcrumb a { color: var(--text3); text-decoration: none; transition: color 0.15s; }
+.breadcrumb a:hover { color: var(--accent); }
+.bc-sep { color: var(--border); margin: 0 8px; font-size: 11px; }
+.bc-current { font-weight: 600; color: var(--text); }
+.nav-arrows { display: flex; gap: 4px; flex-shrink: 0; }
+.nav-arrows a { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 6px; border: 1px solid var(--border); color: var(--text2); text-decoration: none; font-size: 14px; transition: all 0.15s; }
+.nav-arrows a:hover { background: var(--accent-light); }
+.nav-arrows a.disabled { opacity: 0.3; pointer-events: none; }
+
+/* ── Chapter strip (shows all sections in current chapter) ── */
+.ch-strip { background: var(--surface); border-bottom: 1px solid var(--border); padding: 6px 24px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+.ch-strip::-webkit-scrollbar { height: 0; }
+.ch-strip a { display: inline-block; font-family: var(--mono); font-size: 12px; color: var(--text3); text-decoration: none; padding: 5px 10px; border-radius: 5px; margin-right: 2px; transition: all 0.12s; }
+.ch-strip a:hover { background: var(--accent-light); color: var(--text2); }
+.ch-strip a.active { background: var(--accent); color: #f5f0eb; }
+
+/* ── Hero ── */
+.hero { padding: 48px 0 32px; border-bottom: 1px solid var(--border); margin-bottom: 36px; }
+.hero-eyebrow { font-family: var(--mono); font-size: 12px; color: var(--text3); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
+.hero h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.8px; line-height: 1.2; margin-bottom: 12px; }
+.hero h1 span { color: var(--text2); font-weight: 500; }
+.hero-sub { font-size: 17px; color: var(--text2); line-height: 1.6; max-width: 620px; }
+
+/* ── TLDR ── */
+.tldr { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 22px 26px; margin-bottom: 36px; }
+.tldr-label { font-family: var(--mono); font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.tldr p { font-size: 15px; color: var(--text2); line-height: 1.7; }
+
+/* ── Section ── */
+.section { margin-bottom: 44px; }
+.section h2 { font-size: 24px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 8px; }
+.section h3 { font-size: 19px; font-weight: 700; margin: 28px 0 8px; }
+.section p { margin-bottom: 14px; font-size: 16px; }
+.section ul, .section ol { margin: 10px 0 14px; padding-left: 24px; font-size: 16px; }
+.section li { margin-bottom: 6px; }
+
+/* ── Concept cards ── */
+.concepts { display: grid; gap: 14px; margin: 20px 0; }
+.concept { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; }
+.concept h3 { font-size: 16px; font-weight: 700; margin: 0 0 6px; }
+.concept .original { font-size: 13px; color: var(--text3); font-style: italic; margin-bottom: 8px; padding: 8px 12px; background: var(--accent-light); border-radius: 6px; line-height: 1.5; }
+.concept .original::before { content: 'From the paper: '; font-weight: 600; font-style: normal; color: var(--text2); }
+.concept .explain { font-size: 15px; color: var(--text2); line-height: 1.6; }
+.concept .explain p { margin-bottom: 6px; }
+
+/* ── Stats ── */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin: 24px 0; }
+.stat { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; text-align: center; }
+.stat-value { font-family: var(--mono); font-size: 22px; font-weight: 500; color: var(--accent); margin-bottom: 4px; }
+.stat-label { font-size: 11px; color: var(--text3); line-height: 1.3; }
+
+/* ── Figures ── */
+.figure-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin: 28px 0; }
+.figure-card img { width: 100%; display: block; }
+.figure-caption { padding: 14px 20px; border-top: 1px solid var(--border); }
+.figure-caption .cap-label { font-family: var(--mono); font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.figure-caption .cap-plain { font-size: 14px; color: var(--text2); line-height: 1.6; }
+.figure-caption .cap-original { font-size: 12px; color: var(--text3); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); line-height: 1.4; }
+
+/* ── Jargon tooltip ── */
+.j { border-bottom: 1.5px dashed var(--text3); cursor: pointer; position: relative; color: inherit; text-decoration: none; padding: 2px 0; }
+.j::before { content: ''; position: absolute; inset: -6px -4px; }
+.j .tip { visibility: hidden; opacity: 0; position: absolute; bottom: calc(100% + 2px); left: 50%; transform: translateX(-50%) translateY(4px); background: var(--accent); color: #f5f0eb; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-style: normal; line-height: 1.55; white-space: normal; width: 320px; max-width: 90vw; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.2); pointer-events: none; transition: opacity 0.15s, transform 0.15s, visibility 0s 0.15s; font-weight: 400; }
+.j .tip::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 8px solid transparent; border-top-color: var(--accent); }
+.j:hover .tip, .j:focus .tip { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; transition: opacity 0.15s, transform 0.15s, visibility 0s; }
+.j .tip .glink { display: block; margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(245,240,235,0.25); font-size: 11px; color: rgba(245,240,235,0.75); font-family: var(--mono); cursor: pointer; }
+.j .tip .glink:hover { color: #fff; }
+.j .tip .glink::before { content: '-> '; }
+
+/* ── Deep-dive link ── */
+.deep-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-family: var(--mono); color: var(--blue); text-decoration: none; padding: 4px 10px; border: 1px solid rgba(58,107,140,0.3); border-radius: 6px; margin: 4px 4px 4px 0; transition: all 0.15s; }
+.deep-link:hover { background: var(--blue-light); }
+.deep-link::after { content: '->'; }
+
+/* ── Callouts ── */
+.example { background: var(--blue-light); border-left: 3px solid var(--blue); padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 18px 0; font-size: 15px; color: var(--text2); }
+.example::before { content: 'Example'; display: block; font-family: var(--mono); font-size: 11px; color: var(--blue); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; margin-bottom: 5px; }
+.takeaway { background: var(--green-light); border-left: 3px solid var(--green); padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 20px 0; font-size: 15px; color: var(--text2); }
+.takeaway::before { content: 'Key takeaway'; display: block; font-family: var(--mono); font-size: 11px; color: var(--green); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; margin-bottom: 5px; }
+.note { background: var(--orange-light); border-left: 3px solid var(--orange); padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 18px 0; font-size: 15px; color: var(--text2); }
+.note::before { content: 'Interesting finding'; display: block; font-family: var(--mono); font-size: 11px; color: var(--orange); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; margin-bottom: 5px; }
+
+/* ── Table ── */
+.data-table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 14px; }
+.data-table th { text-align: left; padding: 8px 10px; border-bottom: 2px solid var(--accent); font-weight: 700; font-size: 12px; font-family: var(--mono); color: var(--text2); }
+.data-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); }
+.data-table tr:hover td { background: var(--accent-light); }
+.num { font-family: var(--mono); text-align: right; }
+
+/* ── Bottom nav ── */
+.bottom-nav { display: flex; justify-content: space-between; align-items: center; padding: 24px 0; margin-top: 40px; border-top: 1px solid var(--border); gap: 12px; }
+.bottom-nav a { font-size: 14px; color: var(--text2); text-decoration: none; padding: 10px 20px; border: 1px solid var(--border); border-radius: 8px; transition: all 0.15s; max-width: 45%; }
+.bottom-nav a:hover { background: var(--accent-light); }
+.bottom-nav a.next { background: var(--accent); color: #f5f0eb; border-color: var(--accent); }
+.bottom-nav a.next:hover { opacity: 0.9; }
+.bottom-nav .spacer { flex: 1; }
+
+/* ── Page grid for index pages ── */
+.page-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 24px 0; }
+.page-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px 22px; text-decoration: none; color: inherit; transition: all 0.15s; }
+.page-card:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.page-card .card-num { font-family: var(--mono); font-size: 12px; color: var(--text3); margin-bottom: 4px; }
+.page-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+.page-card p { font-size: 13px; color: var(--text2); line-height: 1.5; }
+
+/* ── Chapter grid (for intro/conclusion) ── */
+.chapter-grid { display: grid; gap: 14px; margin: 30px 0; }
+.chapter-link { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 22px; text-decoration: none; color: inherit; transition: all 0.15s; display: grid; grid-template-columns: 42px 1fr; gap: 14px; align-items: start; }
+.chapter-link:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.chapter-num { font-family: var(--mono); font-size: 14px; color: var(--text3); background: var(--accent-light); width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 8px; }
+.chapter-link h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; color: var(--text); }
+.chapter-link p { font-size: 13px; color: var(--text2); line-height: 1.5; margin: 0; }
+
+@media (max-width: 700px) {
+  .hero h1 { font-size: 24px; }
+  .hero { padding: 36px 0 24px; }
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .page-grid { grid-template-columns: 1fr; }
+  .breadcrumb { font-size: 12px; }
+  .ch-strip a { font-size: 11px; padding: 4px 8px; }
+}
+html { scroll-behavior: smooth; }
+</style></head>
+<body>
+<nav class="topnav"><div class="breadcrumb"><a href="../mai_intro.html">MAI-Thinking-1</a><span class="bc-sep">/</span><a href="index.html">Ch 6: Cluster Environment</a><span class="bc-sep">/</span><span class="bc-current">6.3 Inference & Sustainability</span></div><div class="nav-arrows"><a href="1-training.html" title="Previous">&larr;</a><a href="../conclusion.html" title="Next">&rarr;</a></div></nav>
+<div class="ch-strip"><a href="index.html">Overview</a><a href="1-training.html">6.1</a><a href="2-inference.html" class="active">6.3</a></div>
+<div class="container">
+<section class="hero">
+  <div class="hero-eyebrow">Section 6.3</div>
+  <h1>Inference &amp; Sustainability</h1>
+  <p class="hero-sub">Custom MAIA-200 silicon for efficient deployment and community-first infrastructure initiatives.</p>
+</section>
+<div class="tldr"><div class="tldr-label">TL;DR</div><p>MAI-Thinking-1 runs on Microsoft's custom MAIA-200 hardware, delivering 40%+ higher token throughput per watt compared to GB200. Training infrastructure in Phoenix, AZ is LEED Gold certified with 100% renewable energy matching and $50M+ investment in local water infrastructure and workforce development.</p></div>
+
+<div class="section">
+  <h2>Inference on Custom Silicon</h2>
+  <p>As reasoning models generate very long outputs (up to 128k tokens of thinking), inference cost and latency become critical deployment constraints. The team implemented MAI-Thinking-1 on Microsoft's custom <a class="j" href="https://www.google.com/search?q=What+is+Microsoft+MAIA-200+AI+chip%2C+how+MAIA+custom+silicon+compares+to+NVIDIA+GPUs+for+inference" target="_blank">MAIA-200<span class="tip">Microsoft Azure Integrated Accelerator &mdash; a custom AI chip designed by Microsoft specifically for inference workloads. Unlike general-purpose GPUs, MAIA is optimized for the specific computation patterns of large language model serving.<span class="glink">Learn more</span></span></a> hardware.</p>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-value">40%+</div><div class="stat-label">Higher token throughput vs GB200 (same power budget)</div></div>
+  </div>
+
+  <p>The improvement is measured in <strong>performance per watt</strong> &mdash; not just raw speed but how many tokens you can generate for a given amount of electrical power. This matters enormously at datacenter scale where power is often the binding constraint.</p>
+
+  <div class="example"><strong>Why performance per watt matters:</strong> A datacenter has a fixed power budget (say, 100 megawatts). With GB200 GPUs, you can serve X users simultaneously. With MAIA-200 at 40%+ better efficiency, you can serve 1.4X users from the same power budget &mdash; or serve the same users at lower electricity cost.</div>
+</div>
+
+<div class="section">
+  <h2>Inference Serving at Scale</h2>
+  <p>Serving a ~1T parameter MoE model to production traffic requires solving several engineering challenges:</p>
+  <ul>
+    <li><strong>Model distribution:</strong> The full model doesn't fit on one GPU. <a class="j" href="https://www.google.com/search?q=What+is+tensor+parallelism+in+LLM+serving%2C+how+tensor+parallelism+splits+models+across+GPUs" target="_blank">Tensor parallelism<span class="tip">Splitting each layer's weight matrices across multiple GPUs. Every GPU computes a portion of every layer, then synchronizes via all-reduce after each layer. Requires high-bandwidth interconnect (NVLink).<span class="glink">Learn more</span></span></a> splits weight matrices so each GPU holds a fraction; <a class="j" href="https://www.google.com/search?q=What+is+pipeline+parallelism+in+distributed+deep+learning" target="_blank">pipeline parallelism<span class="tip">Assigning groups of consecutive layers to different GPUs. Data flows through them sequentially. Only activations (small) are communicated between stages. Can use slower interconnects than tensor parallelism.<span class="glink">Learn more</span></span></a> puts different layers on different GPUs.</li>
+    <li><strong><a class="j" href="https://www.google.com/search?q=What+is+continuous+batching+in+LLM+serving%2C+how+continuous+batching+improves+throughput" target="_blank">Continuous batching<span class="tip">Iteration-level scheduling where finished sequences are immediately replaced by new ones, rather than waiting for an entire batch to complete. Eliminates padding waste and achieves 2-3x higher throughput than static batching.<span class="glink">Learn more</span></span></a>:</strong> As soon as one request finishes generating, a new one takes its slot immediately. No padding waste, no waiting. Used by SGLang (MAI's inference engine), vLLM, and TensorRT-LLM.</li>
+    <li><strong>KV cache management:</strong> Each concurrent request's KV cache consumes GPU memory. For long-context requests (128K+ tokens), the cache alone can exceed the model weights in memory. <a class="j" href="https://www.google.com/search?q=What+is+PagedAttention+in+LLM+serving%2C+how+PagedAttention+manages+KV+cache+memory" target="_blank">PagedAttention<span class="tip">A memory management technique that allocates KV cache in fixed-size pages (like virtual memory in operating systems) rather than contiguous blocks. Eliminates memory fragmentation and enables efficient memory sharing across requests.<span class="glink">Learn more</span></span></a> manages this with virtual memory-style page allocation.</li>
+    <li><strong>Prefix caching:</strong> For agentic workloads where multiple turns share the same context prefix, caching the computed KV values for the shared portion avoids redundant computation. MAI achieves 97-98% prefix cache hit rates on multi-turn workloads.</li>
+  </ul>
+</div>
+
+<div class="section">
+  <h2>Sustainability</h2>
+  <p>MAI-Thinking-1 was primarily trained on Microsoft-owned infrastructure in Phoenix, AZ, built to <a class="j" href="https://www.google.com/search?q=What+is+LEED+Gold+certification+for+buildings%2C+how+LEED+measures+environmental+sustainability" target="_blank">LEED Gold<span class="tip">Leadership in Energy and Environmental Design &mdash; a green building certification system. Gold is the second-highest tier (after Platinum). It recognizes buildings with excellent environmental sustainability, energy efficiency, water conservation, and indoor air quality.<span class="glink">Learn more</span></span></a> certification standards.</p>
+
+  <h3>Environmental Commitments</h3>
+  <ul>
+    <li><strong>100% renewable energy match</strong> &mdash; In 2025, Microsoft matched 100% of its global electricity consumption with renewable energy</li>
+    <li><strong>Renewable diesel</strong> &mdash; Backup generators use a renewable diesel that reduces net carbon emissions vs. petroleum diesel</li>
+    <li><strong>Water positive commitment</strong> &mdash; More than $50M invested in public water assets, including a municipal water storage facility, pipeline extensions, and groundwater recharge programs</li>
+  </ul>
+
+  <h3>Community Investment</h3>
+  <p>Microsoft's Community-First AI Infrastructure initiative focuses on minimizing environmental impact and investing in the communities where infrastructure is built:</p>
+  <ul>
+    <li><strong>Water infrastructure</strong> &mdash; Municipal water storage facility with the City of Goodyear, wastewater pipeline extensions, and groundwater recharge partnerships with the Gila River Water Storage system and The Nature Conservancy</li>
+    <li><strong>Workforce development</strong> &mdash; Datacenter Academy programs at Estrella Mountain Community College and Glendale Community College, providing local residents with skills for infrastructure careers</li>
+  </ul>
+
+  <div class="takeaway">Building frontier AI responsibly means addressing environmental impact at every level: renewable energy for training, custom silicon for efficient inference, and community partnerships where infrastructure is located.</div>
+</div>
+
+<div class="bottom-nav"><a href="1-training.html">&larr; 6.1 Training Cluster & Stability</a><span class="spacer"></span><a href="../conclusion.html" class="next">Ch 7: Conclusion &rarr;</a></div>
+</div></body></html>

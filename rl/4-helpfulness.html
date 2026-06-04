@@ -1,0 +1,296 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>3.4 Helpfulness &amp; Safety Climb — MAI-Thinking-1</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700;8..60,800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #faf6f1; --surface: #ffffff; --border: #e8e2da;
+  --text: #1a1512; --text2: #5c4f43; --text3: #9c8e82;
+  --accent: #3d3129; --accent-light: rgba(61,49,41,0.06);
+  --green: #4a7c3f; --green-light: rgba(74,124,63,0.08);
+  --blue: #3a6b8c; --blue-light: rgba(58,107,140,0.08);
+  --orange: #b8602a; --orange-light: rgba(184,96,42,0.08);
+  --serif: 'Source Serif 4', Georgia, serif;
+  --mono: 'DM Mono', 'SF Mono', monospace;
+}
+body { font-family: var(--serif); background: var(--bg); color: var(--text); line-height: 1.7; font-size: 17px; }
+.container { max-width: 780px; margin: 0 auto; padding: 0 24px; }
+a { color: var(--accent); }
+code { font-family: var(--mono); font-size: 14px; background: var(--accent-light); padding: 2px 6px; border-radius: 4px; color: var(--accent); }
+
+/* ── Topnav: breadcrumb bar ── */
+.topnav { background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.breadcrumb { display: flex; align-items: center; gap: 0; flex-wrap: wrap; font-size: 13px; min-width: 0; }
+.breadcrumb a, .breadcrumb span { white-space: nowrap; }
+.breadcrumb a { color: var(--text3); text-decoration: none; transition: color 0.15s; }
+.breadcrumb a:hover { color: var(--accent); }
+.bc-sep { color: var(--border); margin: 0 8px; font-size: 11px; }
+.bc-current { font-weight: 600; color: var(--text); }
+.nav-arrows { display: flex; gap: 4px; flex-shrink: 0; }
+.nav-arrows a { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 6px; border: 1px solid var(--border); color: var(--text2); text-decoration: none; font-size: 14px; transition: all 0.15s; }
+.nav-arrows a:hover { background: var(--accent-light); }
+.nav-arrows a.disabled { opacity: 0.3; pointer-events: none; }
+
+/* ── Chapter strip (shows all sections in current chapter) ── */
+.ch-strip { background: var(--surface); border-bottom: 1px solid var(--border); padding: 6px 24px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+.ch-strip::-webkit-scrollbar { height: 0; }
+.ch-strip a { display: inline-block; font-family: var(--mono); font-size: 12px; color: var(--text3); text-decoration: none; padding: 5px 10px; border-radius: 5px; margin-right: 2px; transition: all 0.12s; }
+.ch-strip a:hover { background: var(--accent-light); color: var(--text2); }
+.ch-strip a.active { background: var(--accent); color: #f5f0eb; }
+
+/* ── Hero ── */
+.hero { padding: 48px 0 32px; border-bottom: 1px solid var(--border); margin-bottom: 36px; }
+.hero-eyebrow { font-family: var(--mono); font-size: 12px; color: var(--text3); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
+.hero h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.8px; line-height: 1.2; margin-bottom: 12px; }
+.hero h1 span { color: var(--text2); font-weight: 500; }
+.hero-sub { font-size: 17px; color: var(--text2); line-height: 1.6; max-width: 620px; }
+
+/* ── TLDR ── */
+.tldr { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 22px 26px; margin-bottom: 36px; }
+.tldr-label { font-family: var(--mono); font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.tldr p { font-size: 15px; color: var(--text2); line-height: 1.7; }
+
+/* ── Section ── */
+.section { margin-bottom: 44px; }
+.section h2 { font-size: 24px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 8px; }
+.section h3 { font-size: 19px; font-weight: 700; margin: 28px 0 8px; }
+.section p { margin-bottom: 14px; font-size: 16px; }
+.section ul, .section ol { margin: 10px 0 14px; padding-left: 24px; font-size: 16px; }
+.section li { margin-bottom: 6px; }
+
+/* ── Concept cards ── */
+.concepts { display: grid; gap: 14px; margin: 20px 0; }
+.concept { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; }
+.concept h3 { font-size: 16px; font-weight: 700; margin: 0 0 6px; }
+.concept .original { font-size: 13px; color: var(--text3); font-style: italic; margin-bottom: 8px; padding: 8px 12px; background: var(--accent-light); border-radius: 6px; line-height: 1.5; }
+.concept .original::before { content: 'From the paper: '; font-weight: 600; font-style: normal; color: var(--text2); }
+.concept .explain { font-size: 15px; color: var(--text2); line-height: 1.6; }
+.concept .explain p { margin-bottom: 6px; }
+
+/* ── Stats ── */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin: 24px 0; }
+.stat { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; text-align: center; }
+.stat-value { font-family: var(--mono); font-size: 22px; font-weight: 500; color: var(--accent); margin-bottom: 4px; }
+.stat-label { font-size: 11px; color: var(--text3); line-height: 1.3; }
+
+/* ── Figures ── */
+.figure-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin: 28px 0; }
+.figure-card img { width: 100%; display: block; }
+.figure-caption { padding: 14px 20px; border-top: 1px solid var(--border); }
+.figure-caption .cap-label { font-family: var(--mono); font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.figure-caption .cap-plain { font-size: 14px; color: var(--text2); line-height: 1.6; }
+.figure-caption .cap-original { font-size: 12px; color: var(--text3); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); line-height: 1.4; }
+
+/* ── Jargon tooltip ── */
+.j { border-bottom: 1.5px dashed var(--text3); cursor: pointer; position: relative; color: inherit; text-decoration: none; padding: 2px 0; }
+.j::before { content: ''; position: absolute; inset: -6px -4px; }
+.j .tip { visibility: hidden; opacity: 0; position: absolute; bottom: calc(100% + 2px); left: 50%; transform: translateX(-50%) translateY(4px); background: var(--accent); color: #f5f0eb; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-style: normal; line-height: 1.55; white-space: normal; width: 320px; max-width: 90vw; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.2); pointer-events: none; transition: opacity 0.15s, transform 0.15s, visibility 0s 0.15s; font-weight: 400; }
+.j .tip::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 8px solid transparent; border-top-color: var(--accent); }
+.j:hover .tip, .j:focus .tip { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; transition: opacity 0.15s, transform 0.15s, visibility 0s; }
+.j .tip .glink { display: block; margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(245,240,235,0.25); font-size: 11px; color: rgba(245,240,235,0.75); font-family: var(--mono); cursor: pointer; }
+.j .tip .glink:hover { color: #fff; }
+.j .tip .glink::before { content: '-> '; }
+
+/* ── Deep-dive link ── */
+.deep-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-family: var(--mono); color: var(--blue); text-decoration: none; padding: 4px 10px; border: 1px solid rgba(58,107,140,0.3); border-radius: 6px; margin: 4px 4px 4px 0; transition: all 0.15s; }
+.deep-link:hover { background: var(--blue-light); }
+.deep-link::after { content: '->'; }
+
+/* ── Callouts ── */
+.example { background: var(--blue-light); border-left: 3px solid var(--blue); padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 18px 0; font-size: 15px; color: var(--text2); }
+.example::before { content: 'Example'; display: block; font-family: var(--mono); font-size: 11px; color: var(--blue); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; margin-bottom: 5px; }
+.takeaway { background: var(--green-light); border-left: 3px solid var(--green); padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 20px 0; font-size: 15px; color: var(--text2); }
+.takeaway::before { content: 'Key takeaway'; display: block; font-family: var(--mono); font-size: 11px; color: var(--green); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; margin-bottom: 5px; }
+.note { background: var(--orange-light); border-left: 3px solid var(--orange); padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 18px 0; font-size: 15px; color: var(--text2); }
+.note::before { content: 'Interesting finding'; display: block; font-family: var(--mono); font-size: 11px; color: var(--orange); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; margin-bottom: 5px; }
+
+/* ── Table ── */
+.data-table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 14px; }
+.data-table th { text-align: left; padding: 8px 10px; border-bottom: 2px solid var(--accent); font-weight: 700; font-size: 12px; font-family: var(--mono); color: var(--text2); }
+.data-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); }
+.data-table tr:hover td { background: var(--accent-light); }
+.num { font-family: var(--mono); text-align: right; }
+
+/* ── Bottom nav ── */
+.bottom-nav { display: flex; justify-content: space-between; align-items: center; padding: 24px 0; margin-top: 40px; border-top: 1px solid var(--border); gap: 12px; }
+.bottom-nav a { font-size: 14px; color: var(--text2); text-decoration: none; padding: 10px 20px; border: 1px solid var(--border); border-radius: 8px; transition: all 0.15s; max-width: 45%; }
+.bottom-nav a:hover { background: var(--accent-light); }
+.bottom-nav a.next { background: var(--accent); color: #f5f0eb; border-color: var(--accent); }
+.bottom-nav a.next:hover { opacity: 0.9; }
+.bottom-nav .spacer { flex: 1; }
+
+/* ── Page grid for index pages ── */
+.page-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 24px 0; }
+.page-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px 22px; text-decoration: none; color: inherit; transition: all 0.15s; }
+.page-card:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.page-card .card-num { font-family: var(--mono); font-size: 12px; color: var(--text3); margin-bottom: 4px; }
+.page-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+.page-card p { font-size: 13px; color: var(--text2); line-height: 1.5; }
+
+/* ── Chapter grid (for intro/conclusion) ── */
+.chapter-grid { display: grid; gap: 14px; margin: 30px 0; }
+.chapter-link { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 22px; text-decoration: none; color: inherit; transition: all 0.15s; display: grid; grid-template-columns: 42px 1fr; gap: 14px; align-items: start; }
+.chapter-link:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.chapter-num { font-family: var(--mono); font-size: 14px; color: var(--text3); background: var(--accent-light); width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 8px; }
+.chapter-link h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; color: var(--text); }
+.chapter-link p { font-size: 13px; color: var(--text2); line-height: 1.5; margin: 0; }
+
+@media (max-width: 700px) {
+  .hero h1 { font-size: 24px; }
+  .hero { padding: 36px 0 24px; }
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .page-grid { grid-template-columns: 1fr; }
+  .breadcrumb { font-size: 12px; }
+  .ch-strip a { font-size: 11px; padding: 4px 8px; }
+}
+html { scroll-behavior: smooth; }
+</style></head>
+<body>
+<nav class="topnav"><div class="breadcrumb"><a href="../mai_intro.html">MAI-Thinking-1</a><span class="bc-sep">/</span><a href="index.html">Ch 3: The RL Climb</a><span class="bc-sep">/</span><span class="bc-current">3.4 Helpfulness & Safety Climb</span></div><div class="nav-arrows"><a href="3-agentic.html" title="Previous">&larr;</a><a href="5-consolidation.html" title="Next">&rarr;</a></div></nav>
+<div class="ch-strip"><a href="index.html">Overview</a><a href="1-recipe.html">3.1</a><a href="2-stem.html">3.2</a><a href="3-agentic.html">3.3</a><a href="4-helpfulness.html" class="active">3.4</a><a href="5-consolidation.html">3.5</a><a href="6-infra.html">3.6</a></div>
+<div class="container">
+<section class="hero">
+  <div class="hero-eyebrow">Section 3.4</div>
+  <h1>Helpfulness &amp; Safety Climb</h1>
+  <p class="hero-sub">Teaching the model to be helpful, safe, honest, and well-written through human preference learning.</p>
+</section>
+<div class="tldr"><div class="tldr-label">TL;DR</div><p>The helpfulness climb uses three reward types: a human-preference reward model (cyclic scoring for fairness), AI judges (fast, adaptable feedback), and verifiable rewards (unhackable constraint checking). Safety uses gated rewards where policy compliance is non-negotiable. Honesty training penalizes confident hallucinations most heavily. Style grading uses coarse scales to resist gaming.</p></div>
+
+<div class="section">
+  <h2>Overview</h2>
+  <p>Unlike STEM and agentic tasks (where correctness is objectively verifiable), the helpfulness and safety climb optimizes for <em>subjective</em> qualities: Is the response helpful? Does it follow instructions? Is it safe? Honest? Well-written?</p>
+  <p>This requires a fundamentally different reward strategy: instead of binary correct/incorrect signals, the team uses a combination of human preference models, AI judges, and verifiable constraints.</p>
+</div>
+
+<div class="section">
+  <h2>Reward Signals</h2>
+
+  <h3>1. Reward Model</h3>
+  <p>A fine-tuned version of MAI-Base-1 that predicts human preferences. Trained on human-annotated side-by-side comparisons where annotators rated responses on a 1-5 scale.</p>
+  <p>The reward model uses a clever inference trick: for a set of candidate responses, it evaluates them in all possible orderings (cyclic permutations) and only uses the <em>first-position</em> score from each ordering. This reduces noise from autoregressive position effects.</p>
+
+  <div class="example"><strong>Cyclic reward model scoring:</strong> Given 4 candidate responses A, B, C, D, the model runs 4 times: (A,B,C,D), (B,C,D,A), (C,D,A,B), (D,A,B,C). From each run, only the first token's probability distribution is used. This means each response gets scored exactly once in the privileged first position, ensuring fair comparison.</div>
+
+  <h3>2. AI Judge</h3>
+  <p>A prompted LLM that provides rubric-guided feedback. AI judges can be adapted quickly to target specific behaviors without waiting for reward model retraining. They provide a fast lever for shaping model behavior in targeted ways.</p>
+
+  <h3>3. Verifiable Rewards</h3>
+  <p>For <a class="j" href="https://www.google.com/search?q=What+is+instruction+following+in+LLMs%2C+how+instruction+following+evaluation+works+for+language+models" target="_blank">instruction following<span class="tip">The model's ability to adhere to specific constraints in the user's request: 'respond in exactly 3 paragraphs', 'use no more than 50 words', 'format as JSON'. These can be verified programmatically, providing clean training signal.<span class="glink">Learn more</span></span></a> constraints that can be checked directly (e.g., "respond in a single paragraph", "use fewer than 10 words"), rule-based verifiers provide clean, unhackable rewards. These are less prone to <a class="j" href="https://www.google.com/search?q=What+is+reward+hacking+in+reinforcement+learning%2C+how+AI+models+game+reward+functions" target="_blank">reward hacking<span class="tip">When a model finds shortcuts to maximize its reward score without actually solving the task. For example, an AI judge that rewards longer responses can be hacked by producing verbose, repetitive text. Verifiable rewards are harder to hack because they check specific, concrete properties.<span class="glink">Learn more</span></span></a> than AI-based rewards.</p>
+</div>
+
+<div class="section">
+  <h2>Combining Rewards Safely</h2>
+  <p>A critical challenge: how to combine rewards of different types and scales without letting one dominate? The team uses two complementary strategies:</p>
+
+  <div class="concepts">
+    <div class="concept">
+      <h3>Lexicographic Reward Shaping</h3>
+      <p class="explain">Lower-priority rewards only matter when all responses in the group score equally on higher-priority rewards. Safety comes first &mdash; helpfulness only influences the gradient when all responses are equally safe. This avoids needing to calibrate reward scales.</p>
+    </div>
+    <div class="concept">
+      <h3>Gated Reward Application</h3>
+      <p class="explain">Higher-priority rewards must meet a minimum threshold before lower-priority rewards are applied at all. An unsafe response receives the minimum reward regardless of how well-written it is &mdash; quality never trades off against safety.</p>
+    </div>
+  </div>
+
+  <div class="takeaway">Both strategies avoid the need for cross-scale calibration. Safety is never traded for helpfulness &mdash; an unsafe but eloquent response always scores at the minimum.</div>
+</div>
+
+<div class="section">
+  <h2>Instruction Following</h2>
+  <p>Training covers formatting constraints (paragraph count, word limits), behavioral constraints (tone, formality), and conflicting instructions (system vs. user vs. developer messages). The model must learn instruction hierarchy &mdash; whose instructions take priority when they conflict.</p>
+  <p>Data comes from two sources:</p>
+  <ul>
+    <li><strong>Expert-written contexts</strong> with complex, layered constraints that bootstrap capabilities</li>
+    <li><strong>Synthetic data</strong> generated via a pipeline that creates realistic instructions, scenarios, and evaluation rubrics covering 40+ domains</li>
+  </ul>
+  <p>Difficulty is controlled via <a class="j" href="https://www.google.com/search?q=What+is+pass-rate+analysis+in+RL+training+data%2C+how+difficulty+filtering+works+for+LLM+training" target="_blank">pass-rate analysis<span class="tip">A technique for calibrating training data difficulty. Generate multiple model responses to each prompt and measure what fraction succeed. Keep only prompts where the model succeeds sometimes but not always &mdash; these provide the most learning signal. Too-easy or too-hard prompts are filtered out.<span class="glink">Learn more</span></span></a> &mdash; only prompts that are challenging but solvable are retained.</p>
+</div>
+
+<div class="section">
+  <h2>Safety</h2>
+  <p>Safety training targets two failure modes:</p>
+  <ul>
+    <li><strong>Unsafe compliance</strong> &mdash; The model fulfills a harmful request it should refuse</li>
+    <li><strong>Over-refusal</strong> &mdash; The model unnecessarily refuses a legitimate request</li>
+  </ul>
+  <p>Training data includes:</p>
+  <ul>
+    <li><strong>Harmful prompts</strong> &mdash; From human red-teaming and automated adversarial generation (<a class="j" href="https://www.google.com/search?q=What+is+PyRIT+Python+Risk+Identification+Toolkit%2C+how+PyRIT+tests+AI+safety" target="_blank">PyRIT<span class="tip">Python Risk Identification Toolkit &mdash; a Microsoft tool for automated red-teaming of AI systems. Generates template-based attacks to test model safety boundaries.<span class="glink">Learn more</span></span></a>, <a class="j" href="https://www.google.com/search?q=What+is+PAP+persuasive+adversarial+prompt+attack+on+LLMs%2C+how+persuasion-based+jailbreaks+work" target="_blank">PAP<span class="tip">Persuasive Adversarial Prompts &mdash; attack prompts designed to use persuasion techniques (social proof, authority, emotional appeal) to bypass safety guardrails.<span class="glink">Learn more</span></span></a>, <a class="j" href="https://www.google.com/search?q=What+is+TAP+tree+of+attacks+with+pruning+jailbreak%2C+how+adaptive+multi-turn+attacks+work+on+LLMs" target="_blank">TAP<span class="tip">Tree of Attacks with Pruning &mdash; an adaptive attack method that uses a search tree to iteratively refine jailbreak prompts. More sophisticated than single-shot attacks because it adapts based on the model's responses.<span class="glink">Learn more</span></span></a>)</li>
+    <li><strong>Borderline prompts</strong> &mdash; Sensitive but legitimate requests where the model should <em>not</em> refuse</li>
+  </ul>
+  <p>The safety reward uses a gated approach: policy compliance is checked first. A non-compliant response gets minimum reward regardless of all other qualities.</p>
+</div>
+
+<div class="section">
+  <h2>Honesty</h2>
+  <p>Honesty training teaches the model to be correct when it knows the answer and to hedge appropriately when it doesn't &mdash; without over-hedging (which reduces informativeness). The data spans:</p>
+  <ul>
+    <li><strong>Established facts</strong> &mdash; Short and long-form questions with verifiable reference answers</li>
+    <li><strong>Challenging facts</strong> &mdash; Long-tail or obscure topics where the model may be inconsistent</li>
+    <li><strong>False-premise queries</strong> &mdash; Questions containing incorrect assumptions where no correct affirmative answer exists</li>
+  </ul>
+  <p>The reward uses five categories: Confident_Correct (highest reward), Unconfident_Correct (reduced &mdash; to discourage over-hedging), Not_Attempted (neutral), Unconfident_Incorrect, and Confident_Incorrect (steepest penalty &mdash; confident <a class="j" href="https://www.google.com/search?q=What+are+hallucinations+in+LLMs%2C+why+language+models+generate+confident+but+incorrect+claims" target="_blank">hallucinations<span class="tip">When a model generates claims that sound confident and plausible but are factually incorrect. Unlike human errors, hallucinations are particularly dangerous because the model's confident tone makes them hard to detect without fact-checking.<span class="glink">Learn more</span></span></a> are the worst outcome).</p>
+</div>
+
+<div class="section">
+  <h2>Style</h2>
+  <p>A style guide specifies what good outputs look like:</p>
+  <table class="data-table">
+    <thead><tr><th>Dimension</th><th>Guidance</th></tr></thead>
+    <tbody>
+      <tr><td>Tone</td><td>Professional by default; playful only when asked</td></tr>
+      <tr><td>Layout</td><td>No sycophantic intros ("Great question!"). Clear hierarchy. Important info up front.</td></tr>
+      <tr><td>Density</td><td>No walls of text. Strategic bold. Short sentences.</td></tr>
+      <tr><td>Tables/lists</td><td>Use for multiple points, examples, or data &mdash; not for single items</td></tr>
+      <tr><td>Emojis</td><td>Minimal &mdash; only in clearly casual contexts, never as headers</td></tr>
+    </tbody>
+  </table>
+  <p>Style graders use coarse 3-point scales (0=major issues, 1=minor, 2=none). The team found that coarse graders outperform fine-grained rubrics because they give the judge more flexibility, making them harder for the model to game.</p>
+</div>
+
+<div class="section">
+  <h2>Constraint Taxonomy</h2>
+  <p>The team built a detailed taxonomy to organize the types of instructions a model may be asked to follow. It serves two purposes: guiding data collection toward broad coverage (including rare constraint combinations) and enabling fine-grained performance analysis.</p>
+
+  <h3>Objective (Hard) Constraints</h3>
+  <p>These are rule-based constraints checked by Python functions from a catalog of custom and open-source checkers:</p>
+  <table class="data-table">
+    <thead><tr><th>Type</th><th>Examples</th></tr></thead>
+    <tbody>
+      <tr><td>Numerical</td><td>Length limits, sentence/paragraph counts, item counts, range constraints, ratios</td></tr>
+      <tr><td>Format</td><td>Document structure, lists, tables, code formatting, JSON/YAML serialization, templates, citation formats</td></tr>
+      <tr><td>Content</td><td>Required/prohibited terms, required elements, source/citation requirements, temporal/geographic scope</td></tr>
+      <tr><td>Linguistic</td><td>Language selection, dialect, register, sentence structure, parts of speech, grammar rules</td></tr>
+      <tr><td>Temporal/Sequential</td><td>Chronological ordering, procedural steps, alphabetical order</td></tr>
+      <tr><td>Negative</td><td>Instructions to exclude certain behaviors or formatting patterns</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Subjective (Soft) Constraints</h3>
+  <p>These need judgment to evaluate and are scored by the reward model or AI judges:</p>
+  <table class="data-table">
+    <thead><tr><th>Type</th><th>Examples</th></tr></thead>
+    <tbody>
+      <tr><td>Stylistic</td><td>Tone, voice, vocabulary level, audience adaptation, emotional valence, brand voice</td></tr>
+      <tr><td>Persona</td><td>Role adoption, personality traits, values, emotional state</td></tr>
+      <tr><td>Interaction</td><td>Conversation navigation, certainty/hedging, clarification strategies, prosocial behaviors</td></tr>
+      <tr><td>Reasoning</td><td>Reasoning process requirements, argumentation structure, conditional branching, scope constraints</td></tr>
+      <tr><td>Instruction handling</td><td>Conditionality, multi-step instruction chains, conflict handling</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Multi-Turn Scenario Taxonomy</h3>
+  <p>For conversations spanning multiple turns, the team also tests six specific capabilities:</p>
+  <table class="data-table">
+    <thead><tr><th>Capability</th><th>What It Tests</th></tr></thead>
+    <tbody>
+      <tr><td>Context switching</td><td>Tracking when the user switches topics or returns to a previous topic</td></tr>
+      <tr><td>Instruction retention</td><td>Tracking, updating, and retrieving instructions and facts across long dialogues</td></tr>
+      <tr><td>Instruction layering</td><td>Maintaining a set of active constraints introduced over multiple previous turns</td></tr>
+      <tr><td>Memory &amp; recall</td><td>Proper retrieval and use of facts and statements from previous turns</td></tr>
+      <tr><td>Self coherence</td><td>Avoiding unintended contradiction of previous statements</td></tr>
+      <tr><td>Version editing</td><td>Reverting to earlier versions, selectively undoing edits, reproducing exact text from prior turns</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="bottom-nav"><a href="3-agentic.html">&larr; 3.3 Agentic Climb</a><span class="spacer"></span><a href="5-consolidation.html" class="next">3.5 Consolidation &rarr;</a></div>
+</div></body></html>

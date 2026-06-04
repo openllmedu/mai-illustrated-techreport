@@ -1,0 +1,238 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Mixture of Experts (MoE) — MAI-Thinking-1</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700;8..60,800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #faf6f1; --surface: #ffffff; --border: #e8e2da;
+  --text: #1a1512; --text2: #5c4f43; --text3: #9c8e82;
+  --accent: #3d3129; --accent-light: rgba(61,49,41,0.06);
+  --green: #4a7c3f; --green-light: rgba(74,124,63,0.08);
+  --blue: #3a6b8c; --blue-light: rgba(58,107,140,0.08);
+  --orange: #b8602a; --orange-light: rgba(184,96,42,0.08);
+  --serif: 'Source Serif 4', Georgia, serif;
+  --mono: 'DM Mono', 'SF Mono', monospace;
+}
+body { font-family: var(--serif); background: var(--bg); color: var(--text); line-height: 1.7; font-size: 17px; }
+.container { max-width: 780px; margin: 0 auto; padding: 0 24px; }
+a { color: var(--accent); }
+code { font-family: var(--mono); font-size: 14px; background: var(--accent-light); padding: 2px 6px; border-radius: 4px; color: var(--accent); }
+
+/* ── Topnav: breadcrumb bar ── */
+.topnav { background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.breadcrumb { display: flex; align-items: center; gap: 0; flex-wrap: wrap; font-size: 13px; min-width: 0; }
+.breadcrumb a, .breadcrumb span { white-space: nowrap; }
+.breadcrumb a { color: var(--text3); text-decoration: none; transition: color 0.15s; }
+.breadcrumb a:hover { color: var(--accent); }
+.bc-sep { color: var(--border); margin: 0 8px; font-size: 11px; }
+.bc-current { font-weight: 600; color: var(--text); }
+.nav-arrows { display: flex; gap: 4px; flex-shrink: 0; }
+.nav-arrows a { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 6px; border: 1px solid var(--border); color: var(--text2); text-decoration: none; font-size: 14px; transition: all 0.15s; }
+.nav-arrows a:hover { background: var(--accent-light); }
+.nav-arrows a.disabled { opacity: 0.3; pointer-events: none; }
+
+/* ── Chapter strip (shows all sections in current chapter) ── */
+.ch-strip { background: var(--surface); border-bottom: 1px solid var(--border); padding: 6px 24px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+.ch-strip::-webkit-scrollbar { height: 0; }
+.ch-strip a { display: inline-block; font-family: var(--mono); font-size: 12px; color: var(--text3); text-decoration: none; padding: 5px 10px; border-radius: 5px; margin-right: 2px; transition: all 0.12s; }
+.ch-strip a:hover { background: var(--accent-light); color: var(--text2); }
+.ch-strip a.active { background: var(--accent); color: #f5f0eb; }
+
+/* ── Hero ── */
+.hero { padding: 48px 0 32px; border-bottom: 1px solid var(--border); margin-bottom: 36px; }
+.hero-eyebrow { font-family: var(--mono); font-size: 12px; color: var(--text3); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
+.hero h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.8px; line-height: 1.2; margin-bottom: 12px; }
+.hero h1 span { color: var(--text2); font-weight: 500; }
+.hero-sub { font-size: 17px; color: var(--text2); line-height: 1.6; max-width: 620px; }
+
+/* ── TLDR ── */
+.tldr { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 22px 26px; margin-bottom: 36px; }
+.tldr-label { font-family: var(--mono); font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.tldr p { font-size: 15px; color: var(--text2); line-height: 1.7; }
+
+/* ── Section ── */
+.section { margin-bottom: 44px; }
+.section h2 { font-size: 24px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 8px; }
+.section h3 { font-size: 19px; font-weight: 700; margin: 28px 0 8px; }
+.section p { margin-bottom: 14px; font-size: 16px; }
+.section ul, .section ol { margin: 10px 0 14px; padding-left: 24px; font-size: 16px; }
+.section li { margin-bottom: 6px; }
+
+/* ── Concept cards ── */
+.concepts { display: grid; gap: 14px; margin: 20px 0; }
+.concept { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; }
+.concept h3 { font-size: 16px; font-weight: 700; margin: 0 0 6px; }
+.concept .original { font-size: 13px; color: var(--text3); font-style: italic; margin-bottom: 8px; padding: 8px 12px; background: var(--accent-light); border-radius: 6px; line-height: 1.5; }
+.concept .original::before { content: 'From the paper: '; font-weight: 600; font-style: normal; color: var(--text2); }
+.concept .explain { font-size: 15px; color: var(--text2); line-height: 1.6; }
+.concept .explain p { margin-bottom: 6px; }
+
+/* ── Stats ── */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin: 24px 0; }
+.stat { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; text-align: center; }
+.stat-value { font-family: var(--mono); font-size: 22px; font-weight: 500; color: var(--accent); margin-bottom: 4px; }
+.stat-label { font-size: 11px; color: var(--text3); line-height: 1.3; }
+
+/* ── Figures ── */
+.figure-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin: 28px 0; }
+.figure-card img { width: 100%; display: block; }
+.figure-caption { padding: 14px 20px; border-top: 1px solid var(--border); }
+.figure-caption .cap-label { font-family: var(--mono); font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.figure-caption .cap-plain { font-size: 14px; color: var(--text2); line-height: 1.6; }
+.figure-caption .cap-original { font-size: 12px; color: var(--text3); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); line-height: 1.4; }
+
+/* ── Jargon tooltip ── */
+.j { border-bottom: 1.5px dashed var(--text3); cursor: pointer; position: relative; color: inherit; text-decoration: none; padding: 2px 0; }
+.j::before { content: ''; position: absolute; inset: -6px -4px; }
+.j .tip { visibility: hidden; opacity: 0; position: absolute; bottom: calc(100% + 2px); left: 50%; transform: translateX(-50%) translateY(4px); background: var(--accent); color: #f5f0eb; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-style: normal; line-height: 1.55; white-space: normal; width: 320px; max-width: 90vw; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.2); pointer-events: none; transition: opacity 0.15s, transform 0.15s, visibility 0s 0.15s; font-weight: 400; }
+.j .tip::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 8px solid transparent; border-top-color: var(--accent); }
+.j:hover .tip, .j:focus .tip { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; transition: opacity 0.15s, transform 0.15s, visibility 0s; }
+.j .tip .glink { display: block; margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(245,240,235,0.25); font-size: 11px; color: rgba(245,240,235,0.75); font-family: var(--mono); cursor: pointer; }
+.j .tip .glink:hover { color: #fff; }
+.j .tip .glink::before { content: '-> '; }
+
+/* ── Deep-dive link ── */
+.deep-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-family: var(--mono); color: var(--blue); text-decoration: none; padding: 4px 10px; border: 1px solid rgba(58,107,140,0.3); border-radius: 6px; margin: 4px 4px 4px 0; transition: all 0.15s; }
+.deep-link:hover { background: var(--blue-light); }
+.deep-link::after { content: '->'; }
+
+/* ── Callouts ── */
+.example { background: var(--blue-light); border-left: 3px solid var(--blue); padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 18px 0; font-size: 15px; color: var(--text2); }
+.example::before { content: 'Example'; display: block; font-family: var(--mono); font-size: 11px; color: var(--blue); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; margin-bottom: 5px; }
+.takeaway { background: var(--green-light); border-left: 3px solid var(--green); padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 20px 0; font-size: 15px; color: var(--text2); }
+.takeaway::before { content: 'Key takeaway'; display: block; font-family: var(--mono); font-size: 11px; color: var(--green); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; margin-bottom: 5px; }
+.note { background: var(--orange-light); border-left: 3px solid var(--orange); padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 18px 0; font-size: 15px; color: var(--text2); }
+.note::before { content: 'Interesting finding'; display: block; font-family: var(--mono); font-size: 11px; color: var(--orange); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; margin-bottom: 5px; }
+
+/* ── Table ── */
+.data-table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 14px; }
+.data-table th { text-align: left; padding: 8px 10px; border-bottom: 2px solid var(--accent); font-weight: 700; font-size: 12px; font-family: var(--mono); color: var(--text2); }
+.data-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); }
+.data-table tr:hover td { background: var(--accent-light); }
+.num { font-family: var(--mono); text-align: right; }
+
+/* ── Bottom nav ── */
+.bottom-nav { display: flex; justify-content: space-between; align-items: center; padding: 24px 0; margin-top: 40px; border-top: 1px solid var(--border); gap: 12px; }
+.bottom-nav a { font-size: 14px; color: var(--text2); text-decoration: none; padding: 10px 20px; border: 1px solid var(--border); border-radius: 8px; transition: all 0.15s; max-width: 45%; }
+.bottom-nav a:hover { background: var(--accent-light); }
+.bottom-nav a.next { background: var(--accent); color: #f5f0eb; border-color: var(--accent); }
+.bottom-nav a.next:hover { opacity: 0.9; }
+.bottom-nav .spacer { flex: 1; }
+
+/* ── Page grid for index pages ── */
+.page-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 24px 0; }
+.page-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px 22px; text-decoration: none; color: inherit; transition: all 0.15s; }
+.page-card:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.page-card .card-num { font-family: var(--mono); font-size: 12px; color: var(--text3); margin-bottom: 4px; }
+.page-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+.page-card p { font-size: 13px; color: var(--text2); line-height: 1.5; }
+
+/* ── Chapter grid (for intro/conclusion) ── */
+.chapter-grid { display: grid; gap: 14px; margin: 30px 0; }
+.chapter-link { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 22px; text-decoration: none; color: inherit; transition: all 0.15s; display: grid; grid-template-columns: 42px 1fr; gap: 14px; align-items: start; }
+.chapter-link:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.chapter-num { font-family: var(--mono); font-size: 14px; color: var(--text3); background: var(--accent-light); width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 8px; }
+.chapter-link h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; color: var(--text); }
+.chapter-link p { font-size: 13px; color: var(--text2); line-height: 1.5; margin: 0; }
+
+@media (max-width: 700px) {
+  .hero h1 { font-size: 24px; }
+  .hero { padding: 36px 0 24px; }
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .page-grid { grid-template-columns: 1fr; }
+  .breadcrumb { font-size: 12px; }
+  .ch-strip a { font-size: 11px; padding: 4px 8px; }
+}
+html { scroll-behavior: smooth; }
+</style></head>
+<body>
+<nav class="topnav"><div class="breadcrumb"><a href="../../mai_intro.html">MAI-Thinking-1</a><span class="bc-sep">/</span><a href="../index.html">Ch 2: Pre-training</a><span class="bc-sep">/</span><span class="bc-current">2.1 Model Architecture</span></div><div class="nav-arrows"><a href="../index.html" title="Previous">&larr;</a><a href="../2-ablations.html" title="Next">&rarr;</a></div></nav>
+<div class="ch-strip"><a href="../index.html">Overview</a><a href="../1-architecture.html" class="active">2.1</a><a href="../2-ablations.html">2.2</a><a href="../3-evals.html">2.3</a><a href="../4-data.html">2.4</a><a href="../5-mixture.html">2.5</a><a href="../6-recipe.html">2.6</a><a href="../8-results.html">2.7</a><a href="../7-yolo.html">2.8</a></div>
+<div class="container">
+<section class="hero">
+  <div class="hero-eyebrow">Concept Deep-Dive</div>
+  <h1>Mixture of Experts (MoE)</h1>
+  <p class="hero-sub">How MAI-Base-1 achieves 1T-parameter knowledge with 35B-parameter compute cost</p>
+</section>
+
+<div class="tldr"><div class="tldr-label">TL;DR</div><p>
+  MoE models have many "expert" sub-networks but only activate a few per token, achieving the knowledge capacity of a huge model with the compute cost of a small one. MAI-Base-1 has 512 experts, activates 8 per token, and uses LatentMoE compression to reduce communication overhead.
+</p></div>
+
+<div class="section">
+  <h2>What Problem Does MoE Solve?</h2>
+  <p>There's a tension in AI model design: <strong>bigger models know more</strong>, but <strong>bigger models cost more to run</strong>. A 1-trillion-parameter dense model would be incredibly knowledgeable but prohibitively expensive for every inference.</p>
+  <p>MoE resolves this by making the model <em>conditionally</em> large. The full 1T parameters store knowledge, but only 35B are actually computed for each token. The <a class="j" href="https://www.google.com/search?q=What+is+expert+router+gating+network+in+Mixture+of+Experts+MoE%2C+how+top-k+routing+works+in+LLMs" target="_blank">router<span class="tip">A small network that looks at each token and decides which experts should process it. In MAI-Base-1, it's a learned softmax gating function that selects the top-8 experts out of 512.<span class="glink">Learn more</span></span></a> decides which experts to activate based on the input.</p>
+
+  <div class="example">A dense 1T-parameter model would run all 1 trillion parameters for every token — even the word "the." With MoE, "the" activates only 35B parameters (8 out of 512 experts), using 3.5% of the total model. The other 96.5% sit idle for that token. A different token — say a rare chemistry formula — activates a completely different set of 8 experts, accessing knowledge stored in a different slice of the 1T parameter space. Same total knowledge, 28x less compute per token.</div>
+</div>
+
+<div class="section">
+  <h2>How MAI-Base-1's MoE Works</h2>
+
+  <h3>1. Token arrives at an MoE layer</h3>
+  <p>The token's representation (a vector of numbers) enters the MoE layer after being processed by attention.</p>
+
+  <h3>2. Router selects experts</h3>
+  <p>The router network computes a score for each of the 512 experts using the <em>full-sized</em> token representation. The top-8 scoring experts are selected via <a class="j" href="https://www.google.com/search?q=What+is+softmax+function+in+neural+networks%2C+how+softmax+converts+scores+to+probabilities" target="_blank">softmax<span class="tip">A mathematical function that converts a list of raw scores into probabilities that sum to 1. In MoE routing, softmax turns expert scores [2.1, 0.5, 3.7, ...] into probabilities [0.15, 0.03, 0.42, ...], then the top-8 highest probabilities determine which experts are used.<span class="glink">Learn more</span></span></a> gating.</p>
+
+  <div class="example"><strong>Example:</strong> The token "eigenvalue" arrives. The router scores all 512 experts and finds that experts #12 (linear algebra), #87 (numerical methods), #203 (physics), #341 (differential equations), and four others score highest. These 8 experts process the token, each contributing their specialized knowledge. Meanwhile, experts focused on cooking recipes, legal contracts, or Python web frameworks score low and sit this one out.</div>
+
+  <h3>3. LatentMoE compression</h3>
+  <p>Before the token is sent to its selected experts (which may be on different GPUs), it's compressed to half size via a shared down-projection matrix. This is the "latent" in LatentMoE — tokens travel in a compressed latent space, cutting all-to-all communication volume in half.</p>
+
+  <h3>4. Expert computation</h3>
+  <p>Each of the 8 selected experts processes the compressed token independently using a <a class="j" href="https://www.google.com/search?q=What+is+SwiGLU+activation+function+in+Transformers%2C+how+gated+linear+units+work+in+LLM+FFN+layers" target="_blank">SwiGLU<span class="tip">Swish-Gated Linear Unit — a type of activation function that multiplies a swish activation with a linear gate. Empirically better than ReLU for Transformer FFNs.<span class="glink">Learn more</span></span></a> feed-forward network. The expert expands the compressed representation by 3x, applies the non-linearity, then projects back down.</p>
+
+  <h3>5. Combine and expand</h3>
+  <p>The 8 expert outputs are combined (weighted by router scores), then projected back to full size via a shared up-projection.</p>
+</div>
+
+<div class="section">
+  <h2>Load Balancing</h2>
+  <p>A critical challenge: if most tokens get routed to the same few experts, those experts become bottlenecks while others sit idle. MAI-Base-1 uses:</p>
+
+  <div class="example"><strong>Example of the problem:</strong> Suppose 80% of tokens in a coding-heavy batch all route to the same 20 "code experts." Those 20 experts are overwhelmed with 10x the expected load. The other 492 experts have almost nothing to do. GPU memory spikes on the machines hosting the popular experts (potentially causing out-of-memory crashes), while other GPUs sit idle. Load balancing ensures a more even distribution — each expert should get roughly 134M × 8/512 = ~2M tokens per batch.</div>
+  <ul>
+    <li><strong>Global-batch load balancing loss</strong> — expert frequencies are aggregated across all data-parallel workers and micro-batches within the same global batch (this aggregation strategy matters more than the specific loss type)</li>
+    <li><strong>Fully dropless routing</strong> — no tokens are ever dropped. Variable-size all-to-all communication handles imbalanced loads. A static-memory mode runs multiple capped rounds to prevent OOM from extreme imbalance.</li>
+    <li><strong>GShard-style loss</strong> — performs similarly to loss-free variants when global aggregation is ensured</li>
+  </ul>
+</div>
+
+<div class="section">
+  <h2>Interleaved Layout</h2>
+  <p>Instead of making every FFN layer an MoE (common approach), MAI alternates: MoE -> dense FFN -> MoE -> dense FFN. This interleaved layout:</p>
+  <ul>
+    <li>Matches quality (<a class="j" href="https://www.google.com/search?q=What+is+sparsity+in+Mixture+of+Experts+models%2C+sparse+vs+dense+neural+networks+in+LLMs" target="_blank">sparsity<span class="tip">The fraction of total parameters that are NOT used for any given input. MAI-Base-1 has ~96.5% sparsity — only 35B of 962B parameters activate per token. Higher sparsity = more total knowledge stored with less per-token compute.<span class="glink">Learn more</span></span></a> EG<sub>FLOPs</sub> ≈ 1.0) of all-MoE architectures</li>
+    <li>Is ~20% faster in wall-clock time (EG<sub>Time</sub> advantage)</li>
+    <li>Doesn't benefit from shared experts (unlike all-MoE layouts which rely heavily on them)</li>
+  </ul>
+</div>
+
+<div class="section">
+  <h2>MoE Failure Modes</h2>
+  <p>MoE architectures introduce failure modes that dense models do not have. Understanding these explains why MAI-Base-1 invests heavily in load balancing and dropless routing:</p>
+  <ul>
+    <li><strong>Router collapse:</strong> The router learns to send most tokens to the same 1-2 experts, effectively reducing the model to a fraction of its capacity. The other 500+ experts are wasted. MAI-Base-1 prevents this with global-batch load balancing loss that penalizes uneven distributions.</li>
+    <li><strong>Load imbalance:</strong> Even without full collapse, some experts may receive 10x the expected load while others sit idle. This causes GPU memory spikes on machines hosting popular experts (potentially OOM crashes) while other GPUs waste capacity. MAI's fully dropless routing with variable-size all-to-all communication handles this — a static-memory mode runs multiple capped rounds to prevent OOM from extreme spikes.</li>
+    <li><strong>Quality issues as routing issues:</strong> When an MoE model produces a bad output, the root cause may be a routing decision (wrong expert selected) rather than expert quality. This makes debugging harder than with dense models.</li>
+    <li><strong>Memory: all experts in memory:</strong> Even though only 8 of 512 experts activate per token, all 512 must be loaded in GPU memory. The total parameter count (~1T) determines memory needs, not the active count (35B). Expert parallelism across GPUs is required.</li>
+  </ul>
+</div>
+
+<div class="section">
+  <h2>MoE Models Comparison</h2>
+  <table class="data-table">
+    <tr><th>Model</th><th>Total Params</th><th>Active Params</th><th>Experts</th><th>Top-k</th><th>Key Design</th></tr>
+    <tr><td>MAI-Base-1</td><td class="num">~1T</td><td class="num">35B</td><td class="num">512</td><td class="num">8</td><td>LatentMoE, interleaved, dropless</td></tr>
+    <tr><td>DeepSeek-V3</td><td class="num">671B</td><td class="num">37B</td><td class="num">256</td><td class="num">8</td><td>Shared experts, loss-free balancing</td></tr>
+    <tr><td>Mixtral 8x22B</td><td class="num">141B</td><td class="num">~39B</td><td class="num">8</td><td class="num">2</td><td>Standard top-2 routing</td></tr>
+    <tr><td>Mixtral 8x7B</td><td class="num">46.7B</td><td class="num">~12.9B</td><td class="num">8</td><td class="num">2</td><td>Standard top-2 routing</td></tr>
+    <tr><td>Switch Transformer</td><td class="num">1.6T</td><td class="num">~7B</td><td class="num">2048</td><td class="num">1</td><td>Extreme sparsity, top-1 routing</td></tr>
+  </table>
+  <p>MAI-Base-1 is distinctive in combining the highest expert count among production models (512) with LatentMoE compression and interleaved dense layers — a unique balance of capacity, efficiency, and routing stability.</p>
+</div>
+
+<div class="bottom-nav">
+  <a href="../1-architecture.html">&larr; Back to 2.1 Model Architecture</a>
+  <span class="spacer"></span>
+</div>
+</div></body></html>
